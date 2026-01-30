@@ -1,0 +1,7 @@
+{
+  "name": "IEEE UnB Registration Portal",
+  "description": "A professional registration page for the IEEE Student Branch at the University of Brasília, featuring a clean academic design and Gemini-powered assistance.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
