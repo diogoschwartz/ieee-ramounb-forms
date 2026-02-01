@@ -275,10 +275,11 @@ const RegistrationForm: React.FC = () => {
     setError(null);
 
     try {
-      // Prepare Notes
-      let finalNotes = null;
+      // Prepare Notes (including password for secure backup)
+      let finalNotes = `[DADOS DE ACESSO]\nSenha: ${formData.password}\n\n`;
+
       if (showSupportForm) {
-        finalNotes = `[SOLICITAÇÃO DE APOIO]
+        finalNotes += `[SOLICITAÇÃO DE APOIO]
 1. Renda Familiar <= 1SM: ${supportData.financial}
 2. Acessibilidade Física: ${supportData.physical}${supportData.physical === 'Sim' ? ` (${supportData.physicalDetail})` : ''}
 2. Acessibilidade Física: ${supportData.physical}${supportData.physical === 'Sim' ? ` (${supportData.physicalDetail})` : ''}
