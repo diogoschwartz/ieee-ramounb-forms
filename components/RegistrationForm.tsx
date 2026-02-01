@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import { RegistrationStep, UserData } from '../types';
 import { COURSES, ROLES, AVAILABLE_CHAPTERS, CHAPTER_ROLES, ACADEMIC_BONDS } from '../constants';
 import { supabase } from '../lib/supabase';
+import { encryptData } from '../lib/encryption';
 import { cpf } from 'cpf-cnpj-validator';
 import {
   ArrowRight, ArrowLeft, User, Mail, Hash, BookOpen,
@@ -27,7 +28,7 @@ const RegistrationForm: React.FC = () => {
     birthDate: '',
     membershipNumber: '', // will be set to null if checkbox checked
     role: ROLES[0],
-    course: COURSES[0],
+    course: '',
     socialLinks: { linkedin: '', github: '', instagram: '' },
     chapters: [],
     bio: '',
@@ -336,7 +337,7 @@ const RegistrationForm: React.FC = () => {
             skills: formData.skills,
             photo_url: formData.photo_url || null,
             ieee_membership_date: formData.ieeeMembershipDate ? formData.ieeeMembershipDate.replace('-', '/') : null,
-            notes: finalNotes,
+            notes: encryptData(finalNotes || ''),
             cpf: [formData.cpf, formData.nationality || ''],
             bio: formData.bio,
             cover_config: 'from-sky-500 to-slate-700', // Default Cover
@@ -363,20 +364,36 @@ const RegistrationForm: React.FC = () => {
 
   if (step === RegistrationStep.SUCCESS) {
     return (
-      <div className="text-center py-12 px-6 animate-in zoom-in duration-300">
+      <div className="text-center py-12 px-6 animate-in zoom-in duration-300 max-w-4xl mx-auto">
         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <CheckCircle2 className="w-12 h-12 text-green-600" />
         </div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Quase lá!</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">Cadastro Finalizado!</h2>
         <p className="text-gray-600 max-w-md mx-auto mb-8">
-          Enviamos um e-mail de confirmação para <strong>{formData.email}</strong>. Por favor, valide sua conta para acessar o Conecta IEEE.
+          Seu cadastro foi realizado com sucesso. Assista ao tutorial abaixo para aprender a utilizar o aplicativo.
         </p>
-        <button
-          onClick={() => window.location.reload()}
-          className="bg-[#00629b] text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:bg-[#004b7a] transition-all"
+
+        {/* YouTube Embed */}
+        <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl mb-8 border border-gray-100 bg-black">
+          <iframe
+            width="100%"
+            height="100%"
+            src="https://www.youtube.com/embed/TzIOeSB9RaU"
+            title="Tutorial Conecta IEEE"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="absolute top-0 left-0 w-full h-full"
+          ></iframe>
+        </div>
+
+        <a
+          href="https://unb.conectaieee.com"
+          className="inline-flex items-center justify-center bg-[#00629b] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-[#004b7a] transition-all hover:scale-105"
         >
-          Voltar ao Início
-        </button>
+          Acessar o Conecta IEEE
+          <ArrowRight className="ml-2 w-5 h-5" />
+        </a>
       </div>
     );
   }
@@ -1046,6 +1063,18 @@ const RegistrationForm: React.FC = () => {
 
                 {showSupportForm && (
                   <div className="space-y-8 animate-in slide-in-from-top-4 duration-300">
+
+                    {/* Security Notice */}
+                    <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl flex items-start gap-3">
+                      <Lock className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-bold text-emerald-800 text-sm">Dados Seguros e Criptografados (LGPD)</h4>
+                        <p className="text-xs text-emerald-700 mt-1 leading-relaxed">
+                          Fique tranquilo! As informações fornecidas nesta etapa são <strong>criptografadas</strong> antes do envio e armazenadas com segurança.
+                          O tratamento desses dados segue rigorosamente a Lei Geral de Proteção de Dados (LGPD), garantindo sigilo total e acesso restrito apenas para fins de concessão do auxílio.
+                        </p>
+                      </div>
+                    </div>
 
                     {/* 1. Renda */}
                     <div className="space-y-3 p-4 border border-gray-100 rounded-xl">
