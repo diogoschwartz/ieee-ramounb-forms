@@ -8,7 +8,8 @@ import { cpf } from 'cpf-cnpj-validator';
 import {
   ArrowRight, ArrowLeft, User, Mail, Hash, BookOpen,
   Lock, CheckCircle2, Loader2, Calendar, Award, Globe,
-  Github, Linkedin as LinkedinIcon, Instagram, X, Plus, Trash2, ShieldCheck, MapPin, Link as LinkIcon, Image as ImageIcon, HeartHandshake
+  Github, Linkedin as LinkedinIcon, Instagram, X, Plus, Trash2, ShieldCheck, MapPin, Link as LinkIcon, Image as ImageIcon, HeartHandshake,
+  Eye, EyeOff
 } from 'lucide-react';
 
 const RegistrationForm: React.FC = () => {
@@ -56,6 +57,18 @@ const RegistrationForm: React.FC = () => {
 
   // Support Request State
   const [showSupportForm, setShowSupportForm] = useState(false);
+  const [avatarColor, setAvatarColor] = useState('00a3ef');
+  const [avatarSeed, setAvatarSeed] = useState('');
+  const [showAvatarMenu, setShowAvatarMenu] = useState(false);
+
+  const AVATAR_COLORS = ['00a3ef', '00629b', '22c55e', 'ef4444', 'a855f7', 'f97316', '64748b'];
+
+  const handleAvatarClick = () => {
+    if (!formData.photo_url) {
+      setShowAvatarMenu(!showAvatarMenu);
+    }
+  };
+
   const [supportData, setSupportData] = useState({
     financial: 'Não',
     physical: 'Não',
@@ -235,6 +248,17 @@ const RegistrationForm: React.FC = () => {
       }
     }
 
+    if (currentStep === RegistrationStep.CHAPTERS) {
+      if (formData.chapters.length === 0) {
+        errors.chapters = 'É obrigatório selecionar pelo menos um capítulo para continuar.';
+      } else {
+        const invalidChapter = formData.chapters.some(c => !c.id || !c.role);
+        if (invalidChapter) {
+          errors.chapters = 'Por favor, preencha todos os campos dos capítulos ou remova as linhas vazias.';
+        }
+      }
+    }
+
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
       isValid = false;
@@ -336,7 +360,7 @@ const RegistrationForm: React.FC = () => {
             },
             course: `${formData.course} - ${academicBond}`,
             skills: formData.skills,
-            photo_url: formData.photo_url || null,
+            photo_url: formData.photo_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(avatarSeed || formData.fullName || 'User')}&backgroundColor=${avatarColor}`,
             ieee_membership_date: formData.ieeeMembershipDate ? formData.ieeeMembershipDate.replace('-', '/') : null,
             notes: encryptData(finalNotes || ''),
             cpf: [formData.cpf, formData.nationality || ''],
@@ -374,19 +398,7 @@ const RegistrationForm: React.FC = () => {
           Seu cadastro foi realizado com sucesso. Assista ao tutorial abaixo para aprender a utilizar o aplicativo.
         </p>
 
-        {/* YouTube Embed */}
-        <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl mb-8 border border-gray-100 bg-black">
-          <iframe
-            width="100%"
-            height="100%"
-            src="https://www.youtube.com/embed/TzIOeSB9RaU"
-            title="Tutorial Conecta IEEE"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            className="absolute top-0 left-0 w-full h-full"
-          ></iframe>
-        </div>
+
 
         <a
           href="https://unb.conectaieee.com"
@@ -700,6 +712,11 @@ const RegistrationForm: React.FC = () => {
 
                   {/* Dynamic Chapter List */}
                   <div className="space-y-3">
+                    {validationErrors.chapters && (
+                      <div className="p-3 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm rounded-lg animate-in fade-in slide-in-from-top-2">
+                        {validationErrors.chapters}
+                      </div>
+                    )}
                     {formData.chapters.map((chapter, index) => (
                       <div key={index} className="flex flex-col md:flex-row gap-2 items-start animate-in slide-in-from-left-2 duration-300 p-3 border border-gray-100 rounded-xl bg-gray-50/50">
                         <div className="flex-1 space-y-1 w-full">
@@ -848,26 +865,70 @@ const RegistrationForm: React.FC = () => {
                     </div>
 
                     {/* Avatar Preview */}
-                    <div className="flex-shrink-0">
-                      <div className="w-16 h-16 rounded-full bg-gray-100 border-2 border-white shadow-md overflow-hidden flex items-center justify-center">
-                        {formData.photo_url ? (
-                          <img
-                            src={formData.photo_url}
-                            alt="Preview"
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = '';
-                              (e.target as HTMLImageElement).style.display = 'none';
-                              // Show initials fallback if specific parent logic allowed, but simpler to just hide img and show fallback behind it? 
-                              // Actually let's just use a conditional render or a fallback div behind.
-                            }}
-                          />
-                        ) : (
-                          <span className="text-xl font-bold text-gray-400">
-                            {getInitials(formData.fullName)}
-                          </span>
+                    <div className="flex-shrink-0 group relative">
+                      <div
+                        onClick={handleAvatarClick}
+                        className={`w-16 h-16 rounded-full border-2 border-white shadow-md overflow-hidden flex items-center justify-center transition-all ${!formData.photo_url ? 'cursor-pointer hover:scale-105 active:scale-95' : ''}`}
+                        title={!formData.photo_url ? "Clique para mudar cor e iniciais" : ""}
+                      >
+                        <img
+                          src={formData.photo_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(avatarSeed || formData.fullName || 'User')}&backgroundColor=${avatarColor}`}
+                          alt="Avatar"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(avatarSeed || formData.fullName || 'User')}&backgroundColor=${avatarColor}`;
+                          }}
+                        />
+                        {!formData.photo_url && (
+                          <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                            <Plus className="w-5 h-5 text-white drop-shadow-md" />
+                          </div>
                         )}
                       </div>
+
+                      {/* Avatar Customization Menu */}
+                      {showAvatarMenu && !formData.photo_url && (
+                        <div className="absolute top-full right-0 mt-3 w-64 bg-white rounded-xl shadow-xl border border-gray-100 p-4 z-50 animate-in fade-in zoom-in-95 duration-200">
+                          {/* Triangle Arrow */}
+                          <div className="absolute -top-2 right-6 w-4 h-4 bg-white border-l border-t border-gray-100 transform rotate-45"></div>
+
+                          <div className="relative z-10 space-y-4">
+                            <div className="flex justify-between items-center border-b border-gray-50 pb-2">
+                              <h4 className="font-bold text-gray-700 text-xs uppercase tracking-wider">Personalizar</h4>
+                              <button onClick={() => setShowAvatarMenu(false)} className="text-gray-400 hover:text-red-500 transition-colors">
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+
+                            <div className="space-y-2">
+                              <label className="text-[10px] font-bold text-gray-400 uppercase">Iniciais</label>
+                              <input
+                                type="text"
+                                value={avatarSeed}
+                                onChange={(e) => setAvatarSeed(e.target.value)}
+                                placeholder={getInitials(formData.fullName)}
+                                maxLength={2}
+                                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#00629b] uppercase font-bold text-gray-700 placeholder:font-normal"
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <label className="text-[10px] font-bold text-gray-400 uppercase">Cor de Fundo</label>
+                              <div className="grid grid-cols-5 gap-2">
+                                {AVATAR_COLORS.map(color => (
+                                  <button
+                                    key={color}
+                                    onClick={() => setAvatarColor(color)}
+                                    className={`w-8 h-8 rounded-full border-2 transition-all hover:scale-110 ${avatarColor === color ? 'border-gray-600 scale-110 shadow-sm' : 'border-white ring-1 ring-gray-100'}`}
+                                    style={{ backgroundColor: `#${color}` }}
+                                    title={`Cor #${color}`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -878,40 +939,44 @@ const RegistrationForm: React.FC = () => {
                     <label className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
                       <User className="w-3.5 h-3.5 text-[#00629b]" /> Bio / Mini Currículo
                     </label>
-                    <div className="flex bg-gray-100 p-0.5 rounded-lg">
-                      <button
-                        type="button"
-                        onClick={() => setBioTab('write')}
-                        className={`text-xs font-medium px-3 py-1 rounded-md transition-all ${bioTab === 'write' ? 'bg-white text-[#00629b] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                      >
-                        Escrever
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setBioTab('preview')}
-                        className={`text-xs font-medium px-3 py-1 rounded-md transition-all ${bioTab === 'preview' ? 'bg-white text-[#00629b] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                      >
-                        Visualizar
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setBioTab(bioTab === 'write' ? 'preview' : 'write')}
+                      className="text-xs text-[#00629b] hover:underline font-medium flex items-center gap-1 transition-all"
+                    >
+                      {bioTab === 'preview' ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      {bioTab === 'preview' ? 'Voltar a Editar' : 'Visualizar Preview'}
+                    </button>
                   </div>
 
                   {bioTab === 'write' ? (
-                    <div className="relative">
-                      <textarea
-                        name="bio"
-                        value={formData.bio}
-                        onChange={handleInputChange}
-                        placeholder="Conte um pouco sobre você... (Markdown suportado: **negrito**, *itálico*, links, etc)"
-                        rows={6}
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#00629b]/20 focus:border-[#00629b] transition-all outline-none resize-none font-mono text-sm"
-                      />
-                      <div className="absolute bottom-2 right-2 text-[10px] text-gray-400 pointer-events-none">
-                        Markdown Suportado
+                    <div className="space-y-3">
+                      <div className="relative">
+                        <textarea
+                          name="bio"
+                          value={formData.bio}
+                          onChange={handleInputChange}
+                          placeholder="# Sobre mim... (Use Markdown para formatar títulos, listas, etc)"
+                          rows={6}
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#00629b]/20 focus:border-[#00629b] transition-all outline-none resize-none font-sans text-sm leading-relaxed"
+                        />
+                      </div>
+
+                      {/* Markdown Tips Section */}
+                      <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Dicas de Markdown:</p>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-1 text-[10px] text-gray-500">
+                          <span># Título</span>
+                          <span>## Subtítulo</span>
+                          <span>**Negrito**</span>
+                          <span>*Itálico*</span>
+                          <span>- Lista</span>
+                          <span>[Link](url)</span>
+                        </div>
                       </div>
                     </div>
                   ) : (
-                    <div className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 min-h-[150px] prose prose-sm prose-blue max-w-none overflow-y-auto">
+                    <div className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 min-h-[160px] prose prose-sm prose-blue max-w-none overflow-y-auto break-words">
                       {formData.bio ? (
                         <ReactMarkdown>{formData.bio}</ReactMarkdown>
                       ) : (
