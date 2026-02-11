@@ -33,6 +33,7 @@ export enum RegistrationStep {
   CHAPTERS = 'CHAPTERS', // Chapter Selection
   PROFILE = 'PROFILE',   // Bio, Skills, Social
   SUPPORT = 'SUPPORT',   // Apoio (Financeiro, Acessibilidade, Neurodiversidade)
+  ADDITIONAL_INFO = 'ADDITIONAL_INFO', // Diagnostic Survey
   SUCCESS = 'SUCCESS'
 }
 

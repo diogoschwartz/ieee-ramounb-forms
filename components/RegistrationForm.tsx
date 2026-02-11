@@ -84,6 +84,15 @@ const RegistrationForm: React.FC = () => {
     setSupportData(prev => ({ ...prev, [field]: value }));
   };
 
+  // Diagnostic Survey State
+  const [diagnosticAnswers, setDiagnosticAnswers] = useState<{ [key: string]: any }>({});
+
+  const handleDiagnosticChange = (key: string, value: any) => {
+    setDiagnosticAnswers(prev => ({ ...prev, [key]: value }));
+  };
+
+  const isLeadership = formData.chapters.some(c => c.role !== 'Membro');
+
   const handleNeurodiversityChange = (value: string) => {
     setSupportData(prev => {
       const current = prev.neurodiversity;
@@ -238,7 +247,6 @@ const RegistrationForm: React.FC = () => {
     }
 
     if (currentStep === RegistrationStep.ACADEMIC) {
-      if (!formData.matricula.trim()) errors.matricula = 'Matrícula é obrigatória';
       if (!formData.birthDate) errors.birthDate = 'Data de nascimento é obrigatória';
 
       if (!cpf.isValid(formData.cpf)) errors.cpf = 'CPF inválido';
@@ -278,6 +286,8 @@ const RegistrationForm: React.FC = () => {
       setStep(RegistrationStep.PROFILE);
     } else if (step === RegistrationStep.PROFILE) {
       setStep(RegistrationStep.SUPPORT);
+    } else if (step === RegistrationStep.SUPPORT) {
+      setStep(RegistrationStep.ADDITIONAL_INFO);
     }
   };
 
@@ -291,6 +301,7 @@ const RegistrationForm: React.FC = () => {
     else if (step === RegistrationStep.CHAPTERS) setStep(RegistrationStep.ACADEMIC);
     else if (step === RegistrationStep.PROFILE) setStep(RegistrationStep.CHAPTERS);
     else if (step === RegistrationStep.SUPPORT) setStep(RegistrationStep.PROFILE);
+    else if (step === RegistrationStep.ADDITIONAL_INFO) setStep(RegistrationStep.SUPPORT);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -308,7 +319,43 @@ const RegistrationForm: React.FC = () => {
 2. Acessibilidade Física: ${supportData.physical}${supportData.physical === 'Sim' ? ` (${supportData.physicalDetail})` : ''}
 2. Acessibilidade Física: ${supportData.physical}${supportData.physical === 'Sim' ? ` (${supportData.physicalDetail})` : ''}
 3. Neurodiversidade: ${supportData.neurodiversityCondition ? `[${supportData.neurodiversityCondition}] ` : ''}${supportData.neurodiversity.join(', ')}${supportData.neurodiversityOther ? `, Outro: ${supportData.neurodiversityOther}` : ''}
-4. Suporte Técnico: ${supportData.technical}${supportData.technical === 'Sim' ? ` (${supportData.technicalDetail})` : ''}`;
+4. Suporte Técnico: ${supportData.technical}${supportData.technical === 'Sim' ? ` (${supportData.technicalDetail})` : ''}\n\n`;
+      }
+
+      // Add Diagnostic Survey to Notes
+      if (Object.keys(diagnosticAnswers).length > 0) {
+        const surveyArray = [];
+        // Section 1
+        surveyArray.push(`SEÇÃO 1 - Q1 (Clareza Tarefas): ${diagnosticAnswers['s1_q1'] || '-'}`);
+        surveyArray.push(`SEÇÃO 1 - Q2 (Clareza Prazos): ${diagnosticAnswers['s1_q2'] || '-'}`);
+        surveyArray.push(`SEÇÃO 1 - Q3 (Visão Sistêmica): ${diagnosticAnswers['s1_q3'] || '-'}`);
+        surveyArray.push(`SEÇÃO 1 - Q4 (Organização Infos): ${diagnosticAnswers['s1_q4'] || '-'}`);
+        surveyArray.push(`SEÇÃO 1 - Q5 (Sobrecarga Digital): ${diagnosticAnswers['s1_q5'] || '-'}`);
+        surveyArray.push(`SEÇÃO 1 - Q6 (Estrutura Org): ${diagnosticAnswers['s1_q6'] || '-'}`);
+
+        // Section 2
+        surveyArray.push(`SEÇÃO 2 - Q7 (Benefícios IEEE): ${diagnosticAnswers['s2_q7'] || '-'}`);
+        surveyArray.push(`SEÇÃO 2 - Q8 (Pertencimento): ${diagnosticAnswers['s2_q8'] || '-'}`);
+        surveyArray.push(`SEÇÃO 2 - Q9 (ROI Tempo): ${diagnosticAnswers['s2_q9'] || '-'}`);
+        surveyArray.push(`SEÇÃO 2 - Q10 (Satisfação Geral): ${diagnosticAnswers['s2_q10'] || '-'}`);
+        surveyArray.push(`SEÇÃO 2 - Q11 (NPS): ${diagnosticAnswers['s2_q11'] || '-'}`);
+        surveyArray.push(`SEÇÃO 2 - Feedback (Frustra): ${diagnosticAnswers['s2_feedback_frustra'] || '-'}`);
+        surveyArray.push(`SEÇÃO 2 - Feedback (Funciona): ${diagnosticAnswers['s2_feedback_funciona'] || '-'}`);
+        surveyArray.push(`SEÇÃO 2 - Feedback (Melhorar): ${diagnosticAnswers['s2_feedback_melhorar'] || '-'}`);
+
+        // Section 3 (Leadership)
+        if (isLeadership) {
+          surveyArray.push(`SEÇÃO 3 - Q12 (Visibilidade Status): ${diagnosticAnswers['s3_q12'] || '-'}`);
+          surveyArray.push(`SEÇÃO 3 - Q13 (Visibilidade Capítulos): ${diagnosticAnswers['s3_q13'] || '-'}`);
+          surveyArray.push(`SEÇÃO 3 - Q14 (Oportunidades Perdidas): ${diagnosticAnswers['s3_q14'] || '-'}${diagnosticAnswers['s3_q14'] === 'Sim' ? ` (${diagnosticAnswers['s3_q14_desc'] || ''})` : ''}`);
+          surveyArray.push(`SEÇÃO 3 - Q15 (Gestão Carga): ${diagnosticAnswers['s3_q15'] || '-'}`);
+          surveyArray.push(`SEÇÃO 3 - Q16 (Onboarding): ${diagnosticAnswers['s3_q16'] || '-'}`);
+          surveyArray.push(`SEÇÃO 3 - Feedback (Gargalo): ${diagnosticAnswers['s3_feedback_gargalo'] || '-'}`);
+          surveyArray.push(`SEÇÃO 3 - Feedback (Tempo): ${diagnosticAnswers['s3_feedback_tempo'] || '-'}`);
+          surveyArray.push(`SEÇÃO 3 - Feedback (Plataforma): ${diagnosticAnswers['s3_feedback_plataforma'] || '-'}`);
+        }
+
+        finalNotes += `[DIAGNÓSTICO ORGANIZACIONAL]\n${JSON.stringify(surveyArray)}`;
       }
 
       // 2. Determine Main Role (Dynamic)
@@ -398,6 +445,18 @@ const RegistrationForm: React.FC = () => {
           Seu cadastro foi realizado com sucesso. Assista ao tutorial abaixo para aprender a utilizar o aplicativo.
         </p>
 
+        <div className="flex justify-center mb-8 relative" style={{ paddingBottom: '56.25%', height: 0 }}>
+          <iframe
+            src="https://player.vimeo.com/video/1164069023?h=857b485292"
+            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+            frameBorder="0"
+            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+            allowFullScreen
+            title="Tutorial Conecta IEEE"
+            className="rounded-xl shadow-lg"
+          ></iframe>
+        </div>
+
 
 
         <a
@@ -433,10 +492,11 @@ const RegistrationForm: React.FC = () => {
                 {step === RegistrationStep.CHAPTERS && "Selecione os capítulos que você participa."}
                 {step === RegistrationStep.PROFILE && "Personalize seu perfil com fotos e redes sociais."}
                 {step === RegistrationStep.SUPPORT && "Informe suas necessidades de apoio (opcional)."}
+                {step === RegistrationStep.ADDITIONAL_INFO && "Ajude-nos a melhorar o IEEE com seu feedback."}
               </p>
             </div>
             <div className="flex gap-2">
-              {[RegistrationStep.ACCOUNT, RegistrationStep.ACADEMIC, RegistrationStep.CHAPTERS, RegistrationStep.PROFILE, RegistrationStep.SUPPORT].map((s, idx) => (
+              {[RegistrationStep.ACCOUNT, RegistrationStep.ACADEMIC, RegistrationStep.CHAPTERS, RegistrationStep.PROFILE, RegistrationStep.SUPPORT, RegistrationStep.ADDITIONAL_INFO].map((s, idx) => (
                 <div
                   key={idx}
                   className={`w-10 h-1.5 rounded-full transition-all duration-300 ${step === s ? 'bg-[#00629b]' : 'bg-gray-100'
@@ -592,7 +652,6 @@ const RegistrationForm: React.FC = () => {
                       <Hash className="w-3.5 h-3.5 text-[#00629b]" /> Matrícula UnB
                     </label>
                     <input
-                      required
                       type="text"
                       name="matricula"
                       value={formData.matricula}
@@ -840,6 +899,16 @@ const RegistrationForm: React.FC = () => {
             {/* STEP 4: PROFILE */}
             {step === RegistrationStep.PROFILE && (
               <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+
+                {/* Save and Finish Later Button */}
+                <button
+                  type="button"
+                  onClick={() => setStep(RegistrationStep.SUPPORT)}
+                  className="w-full bg-blue-50 text-[#00629b] py-3 rounded-xl font-bold border border-blue-100 hover:bg-blue-100 transition-all flex items-center justify-center gap-2 mb-2"
+                >
+                  Preencher Depois (Opcional)
+                  <ArrowRight className="w-4 h-4" />
+                </button>
 
                 {/* PHOTO URL */}
                 <div className="space-y-2">
@@ -1281,6 +1350,514 @@ const RegistrationForm: React.FC = () => {
                     <ArrowLeft className="w-5 h-5" /> Voltar
                   </button>
                   <button
+                    type="button"
+                    onClick={handleNext}
+                    className="flex-[2] flex items-center justify-center gap-2 bg-[#00629b] text-white py-4 rounded-xl font-bold shadow-lg hover:bg-[#004b7a] transition-all group"
+                  >
+                    Próximo: Diagnóstico <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </div>
+
+              </div>
+            )}
+
+            {/* STEP 6: ADDITIONAL INFO (Diagnostic Survey) */}
+            {step === RegistrationStep.ADDITIONAL_INFO && (
+              <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+                <div className="bg-blue-50 p-6 rounded-2xl">
+                  <div className="flex items-center gap-4 mb-2">
+                    <div className="bg-white p-2 rounded-full shadow-sm">
+                      <HeartHandshake className="w-6 h-6 text-[#00629b]" />
+                    </div>
+                    <h3 className="font-bold text-[#00629b] text-lg">Diagnóstico Organizacional IEEE</h3>
+                  </div>
+                  <p className="text-sm text-blue-800/80 leading-relaxed">
+                    Ajude-nos a mapear a situação atual do Ramo/Capítulos antes da implementação da nova plataforma e do sistema de cultura/bonificação.
+                  </p>
+                </div>
+
+                {/* Section 1 */}
+                <div className="space-y-6 pt-4">
+                  <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100 pb-2">
+                    Seção 1: Organização e Execução
+                  </h4>
+
+                  {/* Q1 */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-bold text-gray-700 block">
+                      1. Clareza das Tarefas: Em uma escala de 1 a 5, o quanto suas responsabilidades atuais são claras para você?
+                    </label>
+                    <div className="flex justify-between gap-1">
+                      {[1, 2, 3, 4, 5].map(val => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => handleDiagnosticChange('s1_q1', val)}
+                          className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s1_q1'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                        >
+                          {val}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex justify-between text-[10px] text-gray-400 px-1">
+                      <span>Nunca sei o que fazer</span>
+                      <span>Sempre sei</span>
+                    </div>
+                  </div>
+
+                  {/* Q2 */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-bold text-gray-700 block">
+                      2. Clareza de Prazos: O quanto os prazos das suas atividades são claros e bem definidos?
+                    </label>
+                    <div className="flex justify-between gap-1">
+                      {[1, 2, 3, 4, 5].map(val => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => handleDiagnosticChange('s1_q2', val)}
+                          className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s1_q2'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                        >
+                          {val}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex justify-between text-[10px] text-gray-400 px-1">
+                      <span>Sempre confuso</span>
+                      <span>Sempre definido</span>
+                    </div>
+                  </div>
+
+                  {/* Q3 */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-bold text-gray-700 block">
+                      3. Visão Sistêmica do Projeto: Você consegue enxergar como sua tarefa contribui para o resultado final?
+                    </label>
+                    <div className="flex justify-between gap-1">
+                      {[1, 2, 3, 4, 5].map(val => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => handleDiagnosticChange('s1_q3', val)}
+                          className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s1_q3'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                        >
+                          {val}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex justify-between text-[10px] text-gray-400 px-1">
+                      <span>Não vejo conexão</span>
+                      <span>Entendo o fluxo</span>
+                    </div>
+                  </div>
+
+                  {/* Q4 */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-bold text-gray-700 block">
+                      4. Organização das Informações: Quão fácil é encontrar arquivos, decisões antigas ou informações importantes?
+                    </label>
+                    <div className="flex justify-between gap-1">
+                      {[1, 2, 3, 4, 5].map(val => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => handleDiagnosticChange('s1_q4', val)}
+                          className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s1_q4'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                        >
+                          {val}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex justify-between text-[10px] text-gray-400 px-1">
+                      <span>Caótico</span>
+                      <span>Muito organizado</span>
+                    </div>
+                  </div>
+
+                  {/* Q5 */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-bold text-gray-700 block">
+                      5. Sobrecarga Digital: A forma atual de comunicação gera estresse ou sobrecarga?
+                    </label>
+                    <div className="flex justify-between gap-1">
+                      {[1, 2, 3, 4, 5].map(val => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => handleDiagnosticChange('s1_q5', val)}
+                          className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s1_q5'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                        >
+                          {val}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex justify-between text-[10px] text-gray-400 px-1">
+                      <span>Muito estressante</span>
+                      <span>Muito tranquilo</span>
+                    </div>
+                  </div>
+
+                  {/* Q6 */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-bold text-gray-700 block">
+                      6. Estrutura Organizacional: A distinção entre o que é responsabilidade do Ramo e do seu Capítulo é clara?
+                    </label>
+                    <div className="flex justify-between gap-1">
+                      {[1, 2, 3, 4, 5].map(val => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => handleDiagnosticChange('s1_q6', val)}
+                          className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s1_q6'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                        >
+                          {val}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex justify-between text-[10px] text-gray-400 px-1">
+                      <span>Totalmente confuso</span>
+                      <span>Muito claro</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 2 */}
+                <div className="space-y-6 pt-6 border-t border-gray-100">
+                  <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100 pb-2">
+                    Seção 2: Engajamento, Valor e Experiência
+                  </h4>
+
+                  {/* Q7 */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-bold text-gray-700 block">
+                      7. Conhecimento dos Benefícios IEEE: O quanto você conhece e utiliza os benefícios globais?
+                    </label>
+                    <div className="flex justify-between gap-1">
+                      {[1, 2, 3, 4, 5].map(val => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => handleDiagnosticChange('s2_q7', val)}
+                          className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s2_q7'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                        >
+                          {val}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex justify-between text-[10px] text-gray-400 px-1">
+                      <span>Não conheço</span>
+                      <span>Utilizo ativamente</span>
+                    </div>
+                  </div>
+
+                  {/* Q8 */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-bold text-gray-700 block">
+                      8. Senso de Pertencimento: Você se sente parte de uma comunidade ou apenas executa tarefas?
+                    </label>
+                    <div className="flex justify-between gap-1">
+                      {[1, 2, 3, 4, 5].map(val => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => handleDiagnosticChange('s2_q8', val)}
+                          className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s2_q8'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                        >
+                          {val}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex justify-between text-[10px] text-gray-400 px-1">
+                      <span>Desconectado</span>
+                      <span>Totalmente integrado</span>
+                    </div>
+                  </div>
+
+                  {/* Q9 */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-bold text-gray-700 block">
+                      9. ROI (Tempo): Você sente que o tempo dedicado ao IEEE contribui para seu crescimento?
+                    </label>
+                    <div className="flex justify-between gap-1">
+                      {[1, 2, 3, 4, 5].map(val => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => handleDiagnosticChange('s2_q9', val)}
+                          className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s2_q9'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                        >
+                          {val}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex justify-between text-[10px] text-gray-400 px-1">
+                      <span>Perdendo tempo</span>
+                      <span>Excelente retorno</span>
+                    </div>
+                  </div>
+
+                  {/* Q10 */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-bold text-gray-700 block">
+                      10. Satisfação Geral: Quão satisfeito você está com sua experiência atual?
+                    </label>
+                    <div className="flex justify-between gap-1">
+                      {[1, 2, 3, 4, 5].map(val => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => handleDiagnosticChange('s2_q10', val)}
+                          className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s2_q10'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                        >
+                          {val}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex justify-between text-[10px] text-gray-400 px-1">
+                      <span>Muito insatisfeito</span>
+                      <span>Muito satisfeito</span>
+                    </div>
+                  </div>
+
+                  {/* Q11 */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-bold text-gray-700 block">
+                      11. Recomendação (NPS): Qual a probabilidade de você recomendar nosso Ramo/Capítulo?
+                    </label>
+                    <div className="flex justify-between gap-1">
+                      {[1, 2, 3, 4, 5].map(val => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => handleDiagnosticChange('s2_q11', val)}
+                          className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s2_q11'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                        >
+                          {val}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex justify-between text-[10px] text-gray-400 px-1">
+                      <span>Jamais</span>
+                      <span>Com certeza</span>
+                    </div>
+                  </div>
+
+                  {/* Feedback Geral */}
+                  <div className="space-y-4 pt-2">
+                    <p className="text-sm font-bold text-[#00629b]">Outros Comentários</p>
+                    <div>
+                      <label className="text-xs text-gray-500 block mb-1">O que mais te frustra hoje na organização?</label>
+                      <textarea
+                        rows={2}
+                        value={diagnosticAnswers['s2_feedback_frustra'] || ''}
+                        onChange={(e) => handleDiagnosticChange('s2_feedback_frustra', e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-[#00629b] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-500 block mb-1">O que mais funciona bem e não deveria mudar?</label>
+                      <textarea
+                        rows={2}
+                        value={diagnosticAnswers['s2_feedback_funciona'] || ''}
+                        onChange={(e) => handleDiagnosticChange('s2_feedback_funciona', e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-[#00629b] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-500 block mb-1">Se você pudesse melhorar uma coisa imediatamente, o que seria?</label>
+                      <textarea
+                        rows={2}
+                        value={diagnosticAnswers['s2_feedback_melhorar'] || ''}
+                        onChange={(e) => handleDiagnosticChange('s2_feedback_melhorar', e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-[#00629b] outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 3: Leadership Only */}
+                {isLeadership && (
+                  <div className="space-y-6 pt-6 border-t border-gray-100 bg-gray-50/50 -mx-4 px-4 py-6 rounded-xl">
+                    <h4 className="text-sm font-bold text-[#00629b] uppercase tracking-wider border-b border-gray-200 pb-2 mb-4">
+                      Seção 3: Gestão e Liderança
+                    </h4>
+
+                    {/* Q12 */}
+                    <div className="space-y-3">
+                      <label className="text-sm font-bold text-gray-700 block">
+                        12. Visibilidade do Status: Quão fácil é acompanhar o andamento sem perguntar individualmente?
+                      </label>
+                      <div className="flex justify-between gap-1">
+                        {[1, 2, 3, 4, 5].map(val => (
+                          <button
+                            key={val}
+                            type="button"
+                            onClick={() => handleDiagnosticChange('s3_q12', val)}
+                            className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s3_q12'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                          >
+                            {val}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="flex justify-between text-[10px] text-gray-400 px-1">
+                        <span>Preciso perguntar um por um</span>
+                        <span>Visibilidade clara</span>
+                      </div>
+                    </div>
+
+                    {/* Q13 */}
+                    <div className="space-y-3">
+                      <label className="text-sm font-bold text-gray-700 block">
+                        13. Visibilidade entre Capítulos: O quanto você sabe sobre projetos de outros capítulos?
+                      </label>
+                      <div className="flex justify-between gap-1">
+                        {[1, 2, 3, 4, 5].map(val => (
+                          <button
+                            key={val}
+                            type="button"
+                            onClick={() => handleDiagnosticChange('s3_q13', val)}
+                            className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s3_q13'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                          >
+                            {val}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="flex justify-between text-[10px] text-gray-400 px-1">
+                        <span>Não sei nada</span>
+                        <span>Visão clara</span>
+                      </div>
+                    </div>
+
+                    {/* Q14 (Binary) */}
+                    <div className="space-y-3">
+                      <label className="text-sm font-bold text-gray-700 block">
+                        14. Oportunidades Perdidas: Você já perdeu oportunidades por falta de comunicação?
+                      </label>
+                      <div className="flex gap-4">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="s3_q14"
+                            value="Sim"
+                            checked={diagnosticAnswers['s3_q14'] === 'Sim'}
+                            onChange={(e) => handleDiagnosticChange('s3_q14', e.target.value)}
+                            className="text-[#00629b] focus:ring-[#00629b]"
+                          />
+                          <span className="text-sm text-gray-700">Sim</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="s3_q14"
+                            value="Não"
+                            checked={diagnosticAnswers['s3_q14'] === 'Não'}
+                            onChange={(e) => handleDiagnosticChange('s3_q14', e.target.value)}
+                            className="text-[#00629b] focus:ring-[#00629b]"
+                          />
+                          <span className="text-sm text-gray-700">Não</span>
+                        </label>
+                      </div>
+                      {diagnosticAnswers['s3_q14'] === 'Sim' && (
+                        <input
+                          type="text"
+                          placeholder="Descreva brevemente..."
+                          value={diagnosticAnswers['s3_q14_desc'] || ''}
+                          onChange={(e) => handleDiagnosticChange('s3_q14_desc', e.target.value)}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#00629b]"
+                        />
+                      )}
+                    </div>
+
+                    {/* Q15 */}
+                    <div className="space-y-3">
+                      <label className="text-sm font-bold text-gray-700 block">
+                        15. Gestão de Carga: Quão fácil é visualizar a carga da equipe para evitar burnout?
+                      </label>
+                      <div className="flex justify-between gap-1">
+                        {[1, 2, 3, 4, 5].map(val => (
+                          <button
+                            key={val}
+                            type="button"
+                            onClick={() => handleDiagnosticChange('s3_q15', val)}
+                            className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s3_q15'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                          >
+                            {val}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="flex justify-between text-[10px] text-gray-400 px-1">
+                        <span>Sem visibilidade</span>
+                        <span>Totalmente claro</span>
+                      </div>
+                    </div>
+
+                    {/* Q16 */}
+                    <div className="space-y-3">
+                      <label className="text-sm font-bold text-gray-700 block">
+                        16. Onboarding: Um novo membro conseguiria se atualizar com o histórico atual?
+                      </label>
+                      <div className="flex justify-between gap-1">
+                        {[1, 2, 3, 4, 5].map(val => (
+                          <button
+                            key={val}
+                            type="button"
+                            onClick={() => handleDiagnosticChange('s3_q16', val)}
+                            className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s3_q16'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                          >
+                            {val}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="flex justify-between text-[10px] text-gray-400 px-1">
+                        <span>Impossível</span>
+                        <span>Muito fácil</span>
+                      </div>
+                    </div>
+
+                    {/* Feedback Liderança */}
+                    <div className="space-y-4 pt-2">
+                      <p className="text-sm font-bold text-[#00629b]">Comentários de Gestão</p>
+                      <div>
+                        <label className="text-xs text-gray-500 block mb-1">Qual o maior gargalo da gestão hoje?</label>
+                        <textarea
+                          rows={2}
+                          value={diagnosticAnswers['s3_feedback_gargalo'] || ''}
+                          onChange={(e) => handleDiagnosticChange('s3_feedback_gargalo', e.target.value)}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-[#00629b] outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-500 block mb-1">O que mais consome seu tempo como líder?</label>
+                        <textarea
+                          rows={2}
+                          value={diagnosticAnswers['s3_feedback_tempo'] || ''}
+                          onChange={(e) => handleDiagnosticChange('s3_feedback_tempo', e.target.value)}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-[#00629b] outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-500 block mb-1">O que uma plataforma ideal deveria resolver prioritariamente?</label>
+                        <textarea
+                          rows={2}
+                          value={diagnosticAnswers['s3_feedback_plataforma'] || ''}
+                          onChange={(e) => handleDiagnosticChange('s3_feedback_plataforma', e.target.value)}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:border-[#00629b] outline-none"
+                        />
+                      </div>
+                    </div>
+
+                  </div>
+                )}
+
+                <div className="flex gap-4 pt-4 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={handleBack}
+                    className="flex-1 flex items-center justify-center gap-2 border-2 border-gray-100 text-gray-500 py-4 rounded-xl font-bold hover:bg-gray-50 transition-all"
+                  >
+                    <ArrowLeft className="w-5 h-5" /> Voltar
+                  </button>
+                  <button
                     type="submit"
                     disabled={loading}
                     className="flex-[2] flex items-center justify-center gap-2 bg-[#00629b] text-white py-4 rounded-xl font-bold shadow-lg hover:bg-[#004b7a] transition-all disabled:opacity-70"
@@ -1292,7 +1869,6 @@ const RegistrationForm: React.FC = () => {
                     )}
                   </button>
                 </div>
-
               </div>
             )}
 
