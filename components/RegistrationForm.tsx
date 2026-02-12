@@ -337,19 +337,21 @@ const RegistrationForm: React.FC = () => {
         surveyArray.push(`SEÇÃO 2 - Q7 (Benefícios IEEE): ${diagnosticAnswers['s2_q7'] || '-'}`);
         surveyArray.push(`SEÇÃO 2 - Q8 (Pertencimento): ${diagnosticAnswers['s2_q8'] || '-'}`);
         surveyArray.push(`SEÇÃO 2 - Q9 (ROI Tempo): ${diagnosticAnswers['s2_q9'] || '-'}`);
-        surveyArray.push(`SEÇÃO 2 - Q10 (Satisfação Geral): ${diagnosticAnswers['s2_q10'] || '-'}`);
-        surveyArray.push(`SEÇÃO 2 - Q11 (NPS): ${diagnosticAnswers['s2_q11'] || '-'}`);
+        surveyArray.push(`SEÇÃO 2 - Q10 (Capacitação Técnica): ${diagnosticAnswers['s2_q10'] || '-'}`);
+        surveyArray.push(`SEÇÃO 2 - Q11 (Relevância Aprendizado): ${diagnosticAnswers['s2_q11'] || '-'}`);
+        surveyArray.push(`SEÇÃO 2 - Q12 (Satisfação Geral): ${diagnosticAnswers['s2_q12'] || '-'}`);
+        surveyArray.push(`SEÇÃO 2 - Q13 (NPS): ${diagnosticAnswers['s2_q13'] || '-'}`);
         surveyArray.push(`SEÇÃO 2 - Feedback (Frustra): ${diagnosticAnswers['s2_feedback_frustra'] || '-'}`);
         surveyArray.push(`SEÇÃO 2 - Feedback (Funciona): ${diagnosticAnswers['s2_feedback_funciona'] || '-'}`);
         surveyArray.push(`SEÇÃO 2 - Feedback (Melhorar): ${diagnosticAnswers['s2_feedback_melhorar'] || '-'}`);
 
         // Section 3 (Leadership)
         if (isLeadership) {
-          surveyArray.push(`SEÇÃO 3 - Q12 (Visibilidade Status): ${diagnosticAnswers['s3_q12'] || '-'}`);
-          surveyArray.push(`SEÇÃO 3 - Q13 (Visibilidade Capítulos): ${diagnosticAnswers['s3_q13'] || '-'}`);
-          surveyArray.push(`SEÇÃO 3 - Q14 (Oportunidades Perdidas): ${diagnosticAnswers['s3_q14'] || '-'}${diagnosticAnswers['s3_q14'] === 'Sim' ? ` (${diagnosticAnswers['s3_q14_desc'] || ''})` : ''}`);
-          surveyArray.push(`SEÇÃO 3 - Q15 (Gestão Carga): ${diagnosticAnswers['s3_q15'] || '-'}`);
-          surveyArray.push(`SEÇÃO 3 - Q16 (Onboarding): ${diagnosticAnswers['s3_q16'] || '-'}`);
+          surveyArray.push(`SEÇÃO 3 - Q14 (Visibilidade Status): ${diagnosticAnswers['s3_q14'] || '-'}`);
+          surveyArray.push(`SEÇÃO 3 - Q15 (Visibilidade Capítulos): ${diagnosticAnswers['s3_q15'] || '-'}`);
+          surveyArray.push(`SEÇÃO 3 - Q16 (Oportunidades Perdidas): ${diagnosticAnswers['s3_q16'] || '-'}${diagnosticAnswers['s3_q16'] === 'Sim' ? ` (${diagnosticAnswers['s3_q16_desc'] || ''})` : ''}`);
+          surveyArray.push(`SEÇÃO 3 - Q17 (Gestão Carga): ${diagnosticAnswers['s3_q17'] || '-'}`);
+          surveyArray.push(`SEÇÃO 3 - Q18 (Onboarding): ${diagnosticAnswers['s3_q18'] || '-'}`);
           surveyArray.push(`SEÇÃO 3 - Feedback (Gargalo): ${diagnosticAnswers['s3_feedback_gargalo'] || '-'}`);
           surveyArray.push(`SEÇÃO 3 - Feedback (Tempo): ${diagnosticAnswers['s3_feedback_tempo'] || '-'}`);
           surveyArray.push(`SEÇÃO 3 - Feedback (Plataforma): ${diagnosticAnswers['s3_feedback_plataforma'] || '-'}`);
@@ -1599,7 +1601,7 @@ const RegistrationForm: React.FC = () => {
                   {/* Q10 */}
                   <div className="space-y-3">
                     <label className="text-sm font-bold text-gray-700 block">
-                      10. Satisfação Geral: Quão satisfeito você está com sua experiência atual?
+                      10. Capacitação Técnica: Quão satisfeito(a) você está com as capacitações internas (cursos, workshops, treinamentos) oferecidas pelo seu capítulo?
                     </label>
                     <div className="flex justify-between gap-1">
                       {[1, 2, 3, 4, 5].map(val => (
@@ -1622,7 +1624,7 @@ const RegistrationForm: React.FC = () => {
                   {/* Q11 */}
                   <div className="space-y-3">
                     <label className="text-sm font-bold text-gray-700 block">
-                      11. Recomendação (NPS): Qual a probabilidade de você recomendar nosso Ramo/Capítulo?
+                      11. Relevância do Aprendizado: As capacitações internas atuais atendem às suas necessidades de desenvolvimento pessoal/profissional?
                     </label>
                     <div className="flex justify-between gap-1">
                       {[1, 2, 3, 4, 5].map(val => (
@@ -1631,6 +1633,52 @@ const RegistrationForm: React.FC = () => {
                           type="button"
                           onClick={() => handleDiagnosticChange('s2_q11', val)}
                           className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s2_q11'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                        >
+                          {val}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex justify-between text-[10px] text-gray-400 px-1">
+                      <span>Não atendem em nada</span>
+                      <span>Atendem perfeitamente</span>
+                    </div>
+                  </div>
+
+                  {/* Q12 */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-bold text-gray-700 block">
+                      12. Satisfação Geral: Quão satisfeito você está com sua experiência atual?
+                    </label>
+                    <div className="flex justify-between gap-1">
+                      {[1, 2, 3, 4, 5].map(val => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => handleDiagnosticChange('s2_q12', val)}
+                          className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s2_q12'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                        >
+                          {val}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex justify-between text-[10px] text-gray-400 px-1">
+                      <span>Muito insatisfeito</span>
+                      <span>Muito satisfeito</span>
+                    </div>
+                  </div>
+
+                  {/* Q13 */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-bold text-gray-700 block">
+                      13. Recomendação (NPS): Qual a probabilidade de você recomendar nosso Ramo/Capítulo?
+                    </label>
+                    <div className="flex justify-between gap-1">
+                      {[1, 2, 3, 4, 5].map(val => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => handleDiagnosticChange('s2_q13', val)}
+                          className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s2_q13'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
                         >
                           {val}
                         </button>
@@ -1682,18 +1730,18 @@ const RegistrationForm: React.FC = () => {
                       Seção 3: Gestão e Liderança
                     </h4>
 
-                    {/* Q12 */}
+                    {/* Q14 */}
                     <div className="space-y-3">
                       <label className="text-sm font-bold text-gray-700 block">
-                        12. Visibilidade do Status: Quão fácil é acompanhar o andamento sem perguntar individualmente?
+                        14. Visibilidade do Status: Quão fácil é acompanhar o andamento sem perguntar individualmente?
                       </label>
                       <div className="flex justify-between gap-1">
                         {[1, 2, 3, 4, 5].map(val => (
                           <button
                             key={val}
                             type="button"
-                            onClick={() => handleDiagnosticChange('s3_q12', val)}
-                            className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s3_q12'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                            onClick={() => handleDiagnosticChange('s3_q14', val)}
+                            className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s3_q14'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
                           >
                             {val}
                           </button>
@@ -1705,73 +1753,10 @@ const RegistrationForm: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Q13 */}
-                    <div className="space-y-3">
-                      <label className="text-sm font-bold text-gray-700 block">
-                        13. Visibilidade entre Capítulos: O quanto você sabe sobre projetos de outros capítulos?
-                      </label>
-                      <div className="flex justify-between gap-1">
-                        {[1, 2, 3, 4, 5].map(val => (
-                          <button
-                            key={val}
-                            type="button"
-                            onClick={() => handleDiagnosticChange('s3_q13', val)}
-                            className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s3_q13'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
-                          >
-                            {val}
-                          </button>
-                        ))}
-                      </div>
-                      <div className="flex justify-between text-[10px] text-gray-400 px-1">
-                        <span>Não sei nada</span>
-                        <span>Visão clara</span>
-                      </div>
-                    </div>
-
-                    {/* Q14 (Binary) */}
-                    <div className="space-y-3">
-                      <label className="text-sm font-bold text-gray-700 block">
-                        14. Oportunidades Perdidas: Você já perdeu oportunidades por falta de comunicação?
-                      </label>
-                      <div className="flex gap-4">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="radio"
-                            name="s3_q14"
-                            value="Sim"
-                            checked={diagnosticAnswers['s3_q14'] === 'Sim'}
-                            onChange={(e) => handleDiagnosticChange('s3_q14', e.target.value)}
-                            className="text-[#00629b] focus:ring-[#00629b]"
-                          />
-                          <span className="text-sm text-gray-700">Sim</span>
-                        </label>
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="radio"
-                            name="s3_q14"
-                            value="Não"
-                            checked={diagnosticAnswers['s3_q14'] === 'Não'}
-                            onChange={(e) => handleDiagnosticChange('s3_q14', e.target.value)}
-                            className="text-[#00629b] focus:ring-[#00629b]"
-                          />
-                          <span className="text-sm text-gray-700">Não</span>
-                        </label>
-                      </div>
-                      {diagnosticAnswers['s3_q14'] === 'Sim' && (
-                        <input
-                          type="text"
-                          placeholder="Descreva brevemente..."
-                          value={diagnosticAnswers['s3_q14_desc'] || ''}
-                          onChange={(e) => handleDiagnosticChange('s3_q14_desc', e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#00629b]"
-                        />
-                      )}
-                    </div>
-
                     {/* Q15 */}
                     <div className="space-y-3">
                       <label className="text-sm font-bold text-gray-700 block">
-                        15. Gestão de Carga: Quão fácil é visualizar a carga da equipe para evitar burnout?
+                        15. Visibilidade entre Capítulos: O quanto você sabe sobre projetos de outros capítulos?
                       </label>
                       <div className="flex justify-between gap-1">
                         {[1, 2, 3, 4, 5].map(val => (
@@ -1786,23 +1771,86 @@ const RegistrationForm: React.FC = () => {
                         ))}
                       </div>
                       <div className="flex justify-between text-[10px] text-gray-400 px-1">
-                        <span>Sem visibilidade</span>
-                        <span>Totalmente claro</span>
+                        <span>Não sei nada</span>
+                        <span>Visão clara</span>
                       </div>
                     </div>
 
-                    {/* Q16 */}
+                    {/* Q16 (Binary) */}
                     <div className="space-y-3">
                       <label className="text-sm font-bold text-gray-700 block">
-                        16. Onboarding: Um novo membro conseguiria se atualizar com o histórico atual?
+                        16. Oportunidades Perdidas: Você já perdeu oportunidades por falta de comunicação?
+                      </label>
+                      <div className="flex gap-4">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="s3_q16"
+                            value="Sim"
+                            checked={diagnosticAnswers['s3_q16'] === 'Sim'}
+                            onChange={(e) => handleDiagnosticChange('s3_q16', e.target.value)}
+                            className="text-[#00629b] focus:ring-[#00629b]"
+                          />
+                          <span className="text-sm text-gray-700">Sim</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="s3_q16"
+                            value="Não"
+                            checked={diagnosticAnswers['s3_q16'] === 'Não'}
+                            onChange={(e) => handleDiagnosticChange('s3_q16', e.target.value)}
+                            className="text-[#00629b] focus:ring-[#00629b]"
+                          />
+                          <span className="text-sm text-gray-700">Não</span>
+                        </label>
+                      </div>
+                      {diagnosticAnswers['s3_q16'] === 'Sim' && (
+                        <input
+                          type="text"
+                          placeholder="Descreva brevemente..."
+                          value={diagnosticAnswers['s3_q16_desc'] || ''}
+                          onChange={(e) => handleDiagnosticChange('s3_q16_desc', e.target.value)}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#00629b]"
+                        />
+                      )}
+                    </div>
+
+                    {/* Q17 */}
+                    <div className="space-y-3">
+                      <label className="text-sm font-bold text-gray-700 block">
+                        17. Gestão de Carga: Quão fácil é visualizar a carga da equipe para evitar burnout?
                       </label>
                       <div className="flex justify-between gap-1">
                         {[1, 2, 3, 4, 5].map(val => (
                           <button
                             key={val}
                             type="button"
-                            onClick={() => handleDiagnosticChange('s3_q16', val)}
-                            className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s3_q16'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                            onClick={() => handleDiagnosticChange('s3_q17', val)}
+                            className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s3_q17'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                          >
+                            {val}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="flex justify-between text-[10px] text-gray-400 px-1">
+                        <span>Sem visibilidade</span>
+                        <span>Totalmente claro</span>
+                      </div>
+                    </div>
+
+                    {/* Q18 */}
+                    <div className="space-y-3">
+                      <label className="text-sm font-bold text-gray-700 block">
+                        18. Onboarding: Um novo membro conseguiria se atualizar com o histórico atual?
+                      </label>
+                      <div className="flex justify-between gap-1">
+                        {[1, 2, 3, 4, 5].map(val => (
+                          <button
+                            key={val}
+                            type="button"
+                            onClick={() => handleDiagnosticChange('s3_q18', val)}
+                            className={`flex-1 py-3 rounded-lg border text-sm font-bold transition-all ${diagnosticAnswers['s3_q18'] === val ? 'bg-[#00629b] text-white border-[#00629b]' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
                           >
                             {val}
                           </button>
