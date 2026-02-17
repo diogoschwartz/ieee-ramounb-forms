@@ -267,6 +267,31 @@ const RegistrationForm: React.FC = () => {
       }
     }
 
+    if (currentStep === RegistrationStep.ADDITIONAL_INFO) {
+      const requiredFields = [
+        // Section 1
+        's1_q1', 's1_q2', 's1_q3', 's1_q4', 's1_q5', 's1_q6',
+        // Section 2
+        's2_q7', 's2_q8', 's2_q9', 's2_q10', 's2_q11', 's2_q12', 's2_q13'
+      ];
+
+      // Section 3 (Leadership)
+      if (isLeadership) {
+        requiredFields.push('s3_q14', 's3_q15', 's3_q16', 's3_q17', 's3_q18');
+      }
+
+      const missingFields = requiredFields.filter(field => !diagnosticAnswers[field]);
+
+      if (missingFields.length > 0) {
+        errors.diagnostic = 'Por favor, responda todas as perguntas do diagnóstico para finalizar.';
+      }
+
+      // Also check specific follow-up if needed (e.g. s3_q16_desc if s3_q16 is 'Sim')
+      if (isLeadership && diagnosticAnswers['s3_q16'] === 'Sim' && !diagnosticAnswers['s3_q16_desc']) {
+        errors.diagnostic = 'Por favor, descreva a oportunidade perdida na questão 16.';
+      }
+    }
+
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
       isValid = false;
@@ -306,6 +331,14 @@ const RegistrationForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateStep(RegistrationStep.ADDITIONAL_INFO)) {
+      // Scroll to top or show error - validateStep sets the error state
+      const errorDiv = document.querySelector('.validation-error');
+      if (errorDiv) errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -1894,6 +1927,12 @@ const RegistrationForm: React.FC = () => {
                       </div>
                     </div>
 
+                  </div>
+                )}
+
+                {validationErrors.diagnostic && (
+                  <div className="p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm rounded-lg animate-in fade-in slide-in-from-top-2 validation-error">
+                    {validationErrors.diagnostic}
                   </div>
                 )}
 
