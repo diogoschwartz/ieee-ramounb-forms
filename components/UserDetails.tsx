@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { useData } from '../context/DataContext';
+import { AvatarUpload } from './AvatarUpload';
+import { supabase } from '../lib/supabase';
 
 export const UserDetails = () => {
   const { id } = useParams();
@@ -39,6 +41,22 @@ export const UserDetails = () => {
       return <img src={user.coverConfig} className="w-full h-full object-cover" alt="Cover" />;
     }
     return <div className={`w-full h-full bg-gradient-to-br ${user.coverConfig || 'from-blue-600 to-indigo-700'}`}></div>;
+  };
+
+  const handleUploadComplete = async (newUrl: string) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ avatar_url: newUrl })
+        .eq('id', user.id);
+        
+      if (error) throw error;
+      
+      // Update the local context/data if necessary or just reload
+      window.location.reload(); 
+    } catch (err) {
+      console.error('Erro ao atualizar foto no Supabase:', err);
+    }
   };
 
   return (
@@ -70,11 +88,11 @@ export const UserDetails = () => {
               </div>
             </div>
             <div className="px-6 pb-6 relative">
-              <div className="w-32 h-32 rounded-2xl bg-white p-1.5 shadow-lg absolute -top-16 left-1/2 -translate-x-1/2">
-                <img
-                  src={user.foto}
-                  alt={user.nome}
-                  className="w-full h-full object-cover rounded-xl bg-gray-100"
+              <div className="absolute -top-16 left-1/2 -translate-x-1/2">
+                <AvatarUpload 
+                  currentAvatarUrl={user.foto} 
+                  userId={String(user.id)} 
+                  onUploadComplete={handleUploadComplete} 
                 />
               </div>
 

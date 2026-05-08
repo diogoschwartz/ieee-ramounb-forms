@@ -92,6 +92,7 @@ const RegistrationForm: React.FC = () => {
   };
 
   const isLeadership = formData.chapters.some(c => c.role !== 'Membro');
+  const isRecentMember = formData.ieeeMembershipDate ? parseInt(formData.ieeeMembershipDate.split('-')[0]) >= 2026 : false;
 
   const handleNeurodiversityChange = (value: string) => {
     setSupportData(prev => {
@@ -268,27 +269,29 @@ const RegistrationForm: React.FC = () => {
     }
 
     if (currentStep === RegistrationStep.ADDITIONAL_INFO) {
-      const requiredFields = [
-        // Section 1
-        's1_q1', 's1_q2', 's1_q3', 's1_q4', 's1_q5', 's1_q6',
-        // Section 2
-        's2_q7', 's2_q8', 's2_q9', 's2_q10', 's2_q11', 's2_q12', 's2_q13'
-      ];
+      if (!isRecentMember) {
+        const requiredFields = [
+          // Section 1
+          's1_q1', 's1_q2', 's1_q3', 's1_q4', 's1_q5', 's1_q6',
+          // Section 2
+          's2_q7', 's2_q8', 's2_q9', 's2_q10', 's2_q11', 's2_q12', 's2_q13'
+        ];
 
-      // Section 3 (Leadership)
-      if (isLeadership) {
-        requiredFields.push('s3_q14', 's3_q15', 's3_q16', 's3_q17', 's3_q18');
-      }
+        // Section 3 (Leadership)
+        if (isLeadership) {
+          requiredFields.push('s3_q14', 's3_q15', 's3_q16', 's3_q17', 's3_q18');
+        }
 
-      const missingFields = requiredFields.filter(field => !diagnosticAnswers[field]);
+        const missingFields = requiredFields.filter(field => !diagnosticAnswers[field]);
 
-      if (missingFields.length > 0) {
-        errors.diagnostic = 'Por favor, responda todas as perguntas do diagnóstico para finalizar.';
-      }
+        if (missingFields.length > 0) {
+          errors.diagnostic = 'Por favor, responda todas as perguntas do diagnóstico para finalizar.';
+        }
 
-      // Also check specific follow-up if needed (e.g. s3_q16_desc if s3_q16 is 'Sim')
-      if (isLeadership && diagnosticAnswers['s3_q16'] === 'Sim' && !diagnosticAnswers['s3_q16_desc']) {
-        errors.diagnostic = 'Por favor, descreva a oportunidade perdida na questão 16.';
+        // Also check specific follow-up if needed (e.g. s3_q16_desc if s3_q16 is 'Sim')
+        if (isLeadership && diagnosticAnswers['s3_q16'] === 'Sim' && !diagnosticAnswers['s3_q16_desc']) {
+          errors.diagnostic = 'Por favor, descreva a oportunidade perdida na questão 16.';
+        }
       }
     }
 
@@ -861,9 +864,18 @@ const RegistrationForm: React.FC = () => {
 
                 {/* IEEE Membership Date */}
                 <div className="pt-4 border-t border-gray-100">
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2 mb-2">
-                    <Calendar className="w-3.5 h-3.5 text-[#00629b]" /> Data de Entrada no IEEE
-                  </label>
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-2">
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                      <Calendar className="w-3.5 h-3.5 text-[#00629b]" /> Data de Entrada no IEEE
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, ieeeMembershipDate: '2026-05' }))}
+                      className="text-[10px] bg-blue-50 text-[#00629b] px-3 py-1.5 rounded-lg font-bold hover:bg-blue-100 transition-all border border-blue-100 w-fit"
+                    >
+                      ENTREI AGORA PELO PS UNIFICADO
+                    </button>
+                  </div>
                   <div className="flex gap-4">
                     {/* Month Select */}
                     <div className="flex-1">
@@ -1406,12 +1418,20 @@ const RegistrationForm: React.FC = () => {
                     </div>
                     <h3 className="font-bold text-[#00629b] text-lg">Diagnóstico Organizacional IEEE</h3>
                   </div>
-                  <p className="text-sm text-blue-800/80 leading-relaxed">
-                    Ajude-nos a mapear a situação atual do Ramo/Capítulos antes da implementação da nova plataforma e do sistema de cultura/bonificação.
-                  </p>
+                  {isRecentMember ? (
+                    <p className="text-sm text-blue-800/80 leading-relaxed">
+                      Como você entrou a partir de 2026, você é considerado um membro recente. Bem-vindo! Você não precisa preencher o diagnóstico organizacional neste momento. Pode prosseguir e finalizar o cadastro.
+                    </p>
+                  ) : (
+                    <p className="text-sm text-blue-800/80 leading-relaxed">
+                      Ajude-nos a mapear a situação atual do Ramo/Capítulos antes da implementação da nova plataforma e do sistema de cultura/bonificação.
+                    </p>
+                  )}
                 </div>
 
-                {/* Section 1 */}
+                {!isRecentMember && (
+                  <>
+                    {/* Section 1 */}
                 <div className="space-y-6 pt-4">
                   <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100 pb-2">
                     Seção 1: Organização e Execução
@@ -1928,6 +1948,8 @@ const RegistrationForm: React.FC = () => {
                     </div>
 
                   </div>
+                )}
+                  </>
                 )}
 
                 {validationErrors.diagnostic && (

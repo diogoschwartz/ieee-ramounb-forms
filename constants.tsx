@@ -68,3 +68,7 @@ export const CHAPTER_ROLES = [
   'Tesoureiro',
   'Secretário'
 ];
+
+export const AVATAR_MAX_DIMENSION = 400;
+export const AVATAR_QUALITY = 0.80;
+export const AVATAR_MAX_SIZE_BYTES = 512_000;

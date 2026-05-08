@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1045.0",
+    "@aws-sdk/s3-request-presigner": "^3.1045.0",
     "@supabase/supabase-js": "^2.93.3",
     "cpf-cnpj-validator": "^1.0.3",
     "crypto-js": "^4.2.0",

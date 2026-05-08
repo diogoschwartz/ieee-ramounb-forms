@@ -42,3 +42,9 @@ export interface Chapter {
   name: string;
   acronym: string;
 }
+
+export interface AvatarUploadOptions {
+  maxDimension?: number;
+  quality?: number;
+  format?: 'image/jpeg' | 'image/webp';
+}
