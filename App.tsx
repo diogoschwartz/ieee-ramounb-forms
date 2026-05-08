@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import RegistrationForm from './components/RegistrationForm';
-
+import { AvatarToolPage } from './components/AvatarToolPage';
 
 const RegistrationPage: React.FC = () => {
   return (
@@ -50,6 +50,7 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/forms/cadastro_de_membros_ieee2026" element={<RegistrationPage />} />
+        <Route path="/tools/alterar_foto" element={<AvatarToolPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
