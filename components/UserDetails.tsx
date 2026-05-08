@@ -88,7 +88,7 @@ export const UserDetails = () => {
               </div>
             </div>
             <div className="px-6 pb-6 relative">
-              <div className="absolute -top-16 left-1/2 -translate-x-1/2">
+              <div className="absolute -top-16 left-1/2 -translate-x-1/2 z-20">
                 <AvatarUpload 
                   currentAvatarUrl={user.foto} 
                   userId={String(user.id)} 

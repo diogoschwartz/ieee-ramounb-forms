@@ -6,12 +6,14 @@ interface AvatarUploadProps {
   currentAvatarUrl?: string;
   userId: string;
   onUploadComplete: (newUrl: string) => void;
+  showUploadButton?: boolean;
 }
 
 export const AvatarUpload: React.FC<AvatarUploadProps> = ({
   currentAvatarUrl,
   userId,
   onUploadComplete,
+  showUploadButton,
 }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -69,7 +71,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
         )}
 
         {!isUploading && (
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity">
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity pointer-events-none">
             <Upload className="w-6 h-6 text-white drop-shadow-md mb-1" />
             <span className="text-[10px] text-white font-bold tracking-wider">ALTERAR</span>
           </div>
@@ -88,12 +90,25 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
         </div>
       )}
 
+      {showUploadButton && (
+        <button
+          type="button"
+          onClick={handleAvatarClick}
+          disabled={isUploading}
+          className="mt-1 text-xs font-bold bg-white text-[#00629b] border border-[#00629b]/30 px-4 py-2 rounded-lg hover:bg-blue-50 hover:border-[#00629b] transition-all disabled:opacity-50 flex items-center gap-2 shadow-sm"
+        >
+          <Upload className="w-3.5 h-3.5" />
+          {isUploading ? 'Enviando...' : 'Fazer upload de foto'}
+        </button>
+      )}
+
       <input
         type="file"
         ref={fileInputRef}
         onChange={handleFileChange}
         accept="image/jpeg,image/webp,image/png"
-        className="hidden"
+        className="absolute w-0 h-0 opacity-0 overflow-hidden"
+        style={{ pointerEvents: 'none' }}
       />
     </div>
   );
