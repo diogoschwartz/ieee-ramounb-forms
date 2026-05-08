@@ -34,12 +34,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       accessKeyId,
       secretAccessKey,
     },
+    forcePathStyle: true,
   });
 
-  const timestamp = Date.now();
-  // Formato da Key: avatars/UUID/123456789.jpg
+  // Nome fixo para evitar acúmulo de arquivos antigos no storage.
+  // O cache busting (para o navegador atualizar) é feito pelo frontend adicionando ?v=timestamp
   const extension = contentType === 'image/webp' ? 'webp' : 'jpg';
-  const key = `avatars/${userId}/${timestamp}.${extension}`;
+  const key = `avatars/${userId}/profile.${extension}`;
 
   const command = new PutObjectCommand({
     Bucket: bucketName,

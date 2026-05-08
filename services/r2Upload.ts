@@ -54,13 +54,14 @@ export const uploadProfilePicture = async (
     // 3. Fazer upload direto para o R2
     await uploadToR2(presignedUrl, blob, contentType);
 
-    // 4. Retornar URL pública montada
+    // 4. Retornar URL pública montada com cache busting
     const publicUrlBase = import.meta.env.VITE_R2_PUBLIC_URL;
     if (!publicUrlBase) {
       throw new Error('Variável de ambiente VITE_R2_PUBLIC_URL não está configurada.');
     }
 
-    return `${publicUrlBase}/${key}`;
+    const timestamp = Date.now();
+    return `${publicUrlBase}/${key}?v=${timestamp}`;
   } catch (error: any) {
     console.error('Erro no fluxo de upload:', error);
     throw new Error(error.message || 'Ocorreu um erro desconhecido durante o upload.');
