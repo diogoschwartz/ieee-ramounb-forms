@@ -1,21 +1,21 @@
-import CryptoJS from 'crypto-js';
-
-const ENCRYPTION_KEY = import.meta.env.VITE_ENCRYPTION_KEY || '';
-
 /**
- * Encrypts sensitive data using AES.
- * Note: The key must be set in VITE_ENCRYPTION_KEY environment variable.
- * If no key is set, it returns the raw text but logs a warning (for dev safety).
+ * Encrypts sensitive data by delegating to a server-side function.
+ * The encryption key never reaches the browser: it lives only as the
+ * server-side ENCRYPTION_KEY env var, read inside /api/encrypt-notes.
  */
-export const encryptData = (text: string): string => {
+export const encryptData = async (text: string): Promise<string> => {
     if (!text) return '';
 
-    if (!ENCRYPTION_KEY) {
-        console.warn('VITE_ENCRYPTION_KEY is not set. Data will not be encrypted properly.');
-        // In a real scenario, you might want to throw error or block submission,
-        // but for now we return text to avoid breaking the app if config is missing.
-        return text;
+    const response = await fetch('/api/encrypt-notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+    });
+
+    if (!response.ok) {
+        throw new Error('Não foi possível proteger os dados de cadastro. Tente novamente.');
     }
 
-    return CryptoJS.AES.encrypt(text, ENCRYPTION_KEY).toString();
+    const { encrypted } = await response.json();
+    return encrypted;
 };

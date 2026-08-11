@@ -448,7 +448,7 @@ const RegistrationForm: React.FC = () => {
             skills: formData.skills,
             photo_url: formData.photo_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(avatarSeed || formData.fullName || 'User')}&backgroundColor=${avatarColor}`,
             ieee_membership_date: formData.ieeeMembershipDate ? formData.ieeeMembershipDate.replace('-', '/') : null,
-            notes: encryptData(finalNotes || ''),
+            notes: await encryptData(finalNotes || ''),
             cpf: [formData.cpf, formData.nationality || ''],
             bio: formData.bio,
             cover_config: 'from-sky-500 to-slate-700', // Default Cover
